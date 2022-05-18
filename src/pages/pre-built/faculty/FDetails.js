@@ -425,7 +425,7 @@ const ProductDetails = ({ match }) => {
                   <Col md="2 mt-2">
                     <FormGroup>
                       <label className="form-label" htmlFor="middle">
-                        Middle Initial
+                        Middle Name
                       </label>
                       <div className="form-control-wrap">
                         <input

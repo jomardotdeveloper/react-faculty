@@ -25,13 +25,15 @@ import SimpleBar from "simplebar-react";
 import { useForm } from "react-hook-form";
 import ProductH from "../../../images/product/h.png";
 import Dropzone from "react-dropzone";
-import { Modal, ModalBody } from "reactstrap";
+import { Modal, ModalBody, Spinner } from "reactstrap";
 import { RSelect } from "../../../components/Component";
 import { ProductContext } from "./FContext";
 import axios from "axios";
+import Swal from "sweetalert2";
 const FList = () => {
   const { contextData } = useContext(ProductContext);
   const [data, setData] = contextData;
+  const [loading, setLoading] = useState(false);
   // const [data, setData] = useState(fData);
   const [smOption, setSmOption] = useState(false);
   const [formData, setFormData] = useState({
@@ -63,8 +65,17 @@ const FList = () => {
     let index = newData.findIndex((item) => item.id === id);
     let userId = newData[index].user.id;
     if (response.success) {
+      setLoading(true);
+      await axios.get(URL + "send-mail/" + newData[index].user.email);
       newData[index].user.can_login = true;
       setData([...newData]);
+      setLoading(false);
+      Swal.fire({
+        icon: "success",
+        title: "Email has been sent!",
+        text: "Email has been sent!",
+        focusConfirm: false,
+      });
     }
   }
 
@@ -399,69 +410,59 @@ const FList = () => {
                             <DataTableRow className="nk-tb-col-tools">
                               <ul className="nk-tb-actions gx-1 my-n1">
                                 <li className="mr-n1">
-                                  <UncontrolledDropdown>
-                                    <DropdownToggle
-                                      tag="a"
-                                      href="#more"
-                                      onClick={(ev) => ev.preventDefault()}
-                                      className="dropdown-toggle btn btn-icon btn-trigger"
-                                    >
-                                      <Icon name="more-h"></Icon>
-                                    </DropdownToggle>
-                                    <DropdownMenu right>
-                                      <ul className="link-list-opt no-bdr">
-                                        {/* <li>
-                                          <DropdownItem
-                                            tag="a"
-                                            href="#view"
-                                            onClick={(ev) => {
-                                              ev.preventDefault();
-                                              onEditClick(item.id);
-                                              toggle("details");
-                                            }}
-                                          >
-                                            <Icon name="eye"></Icon>
-                                            <span>View</span>
-                                          </DropdownItem>
-                                        </li> */}
-                                        {!item.user.can_login ? (
-                                          <li>
-                                            <DropdownItem
-                                              tag="a"
-                                              href="#accept"
-                                              onClick={(ev) => {
-                                                ev.preventDefault();
-                                                accept(item.id);
-                                                // toggle("details");
-                                              }}
-                                            >
-                                              <Icon name="user-check"></Icon>
-                                              <span>Accept</span>
-                                            </DropdownItem>
-                                          </li>
-                                        ) : (
-                                          ""
-                                        )}
-                                        {item.user.can_login ? (
-                                          <li>
-                                            <DropdownItem
-                                              tag="a"
-                                              href="#refuse"
-                                              onClick={(ev) => {
-                                                ev.preventDefault();
-                                                refuse(item.id);
-                                              }}
-                                            >
-                                              <Icon name="user-cross"></Icon>
-                                              <span>Refuse</span>
-                                            </DropdownItem>
-                                          </li>
-                                        ) : (
-                                          ""
-                                        )}
-                                      </ul>
-                                    </DropdownMenu>
-                                  </UncontrolledDropdown>
+                                  {!loading ? (
+                                    <UncontrolledDropdown>
+                                      <DropdownToggle
+                                        tag="a"
+                                        href="#more"
+                                        onClick={(ev) => ev.preventDefault()}
+                                        className="dropdown-toggle btn btn-icon btn-trigger"
+                                      >
+                                        <Icon name="more-h"></Icon>
+                                      </DropdownToggle>
+                                      <DropdownMenu right>
+                                        <ul className="link-list-opt no-bdr">
+                                          {!item.user.can_login ? (
+                                            <li>
+                                              <DropdownItem
+                                                tag="a"
+                                                href="#accept"
+                                                onClick={(ev) => {
+                                                  ev.preventDefault();
+                                                  accept(item.id);
+                                                  // toggle("details");
+                                                }}
+                                              >
+                                                <Icon name="user-check"></Icon>
+                                                <span>Accept</span>
+                                              </DropdownItem>
+                                            </li>
+                                          ) : (
+                                            ""
+                                          )}
+                                          {item.user.can_login ? (
+                                            <li>
+                                              <DropdownItem
+                                                tag="a"
+                                                href="#refuse"
+                                                onClick={(ev) => {
+                                                  ev.preventDefault();
+                                                  refuse(item.id);
+                                                }}
+                                              >
+                                                <Icon name="user-cross"></Icon>
+                                                <span>Decline</span>
+                                              </DropdownItem>
+                                            </li>
+                                          ) : (
+                                            ""
+                                          )}
+                                        </ul>
+                                      </DropdownMenu>
+                                    </UncontrolledDropdown>
+                                  ) : (
+                                    <Spinner size="sm" color="light" />
+                                  )}
                                 </li>
                               </ul>
                             </DataTableRow>
